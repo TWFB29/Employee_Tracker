@@ -10,7 +10,7 @@ const router = require('express').Router();
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-const apiRoutes = require('./ApiRoutes/departmentRoute');
+// const apiRoutes = require('./ApiRoutes/departmentRoute');
 
 const db = require("./db/connection");
 
@@ -89,11 +89,56 @@ function viewAllEmployees () {
 }
 
 function addRole () {
-    
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'roles',
+            message: 'Enter a name:'
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'Enter a salary:'
+        },
+        {
+            type: 'input',
+            name: 'dpt_id',
+            message: 'Enter a department id:'
+        }
+
+    ]).then(data => {
+        db.query('INSERT INTO role SET?', {Job_title: data.roles, income: data.salary, department_id: data.dpt_id}, (err, res) => {
+            if (err) throw err;
+            console.log('success')
+            promptUser()
+        })
+    })
 }
 
 function addEmployee () {
-    
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstname',
+            message: 'Enter a first name:'
+        },
+        {
+            type: 'input',
+            name: 'lastname',
+            message: 'Enter a last name:'
+        },
+        {
+            type: 'input',
+            name: 'dpt_id',
+            message: 'Enter a department id:'
+        }
+    ]).then(data => {
+        db.query('INSERT INTO employee SET?', {first_name: data.firstname, last_name: data.lastname, role_id: data.dpt_id}, (err, res) => {
+            if (err) throw err;
+            console.log('success')
+            promptUser()
+        })
+    })
 }
 
 function addDepartment () {
