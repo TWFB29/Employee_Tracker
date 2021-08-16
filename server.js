@@ -1,20 +1,24 @@
 const inquirer = require("inquirer");
-// const cTable = require('console.table');
+
 const mysql = require('mysql2');
 // const DatabaseCall = require('./db/index.js')
 const fs = require('fs')
 
 const express = require('express');
+const router = require('express').Router();
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+const apiRoutes = require('./ApiRoutes/departmentRoute');
+
 const db = require("./db/connection");
-// const { connect } = require('./db/connection');
+
+//  const { connect } = require('./db/connection');
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
+// app.use('/api', apiRouts)
 
   const promptUser = () => {
     inquirer.prompt([
@@ -22,9 +26,9 @@ app.use(express.json());
             type: "list",
             name: "role",
             message: "Choose action:",
-            choices: ["View all departments", "View all roles", "View all Employees", "Add a role", "Add an Employee", "Update an employee role", "Done"],
+            choices: ["View all departments", "View all roles", "View all Employees", "Add a role", "Add an Employee", "Add a department", "Done"],
         },
-    ]).then(function (data) {
+    ]).then(data => {
 
         switch (data.role) {
             case "View all departments":
@@ -42,8 +46,8 @@ app.use(express.json());
             case "Add an Employee":
                 addEmployee();
                 break;
-            case "Update an employee role":
-                createDepartment();
+            case "Add a department":
+                addDepartment();
                 break;
             case "Done":
                 done();
@@ -55,20 +59,33 @@ app.use(express.json());
 
 function viewAllDepartments() {
     const sql = 'SELECT * FROM department';
-  db.query(sql, (err, res) => {
+    db.query(sql, (err, res) => {
     if (err) throw err
     console.table(res)
+    promptUser()
         }
     )
     
-}
+};
 
 function viewAllRoles () {
-    
-}
+    const sql = 'SELECT * FROM role';
+  db.query(sql, (err, res) => {
+    if (err) throw err
+    console.table(res)
+    promptUser()
+  }
+  )
+};
 
 function viewAllEmployees () {
-    
+    const sql = 'SELECT * FROM employee';
+  db.query(sql, (err, res) => {
+    if (err) throw err
+    console.table(res)
+    promptUser()
+  }
+  )
 }
 
 function addRole () {
@@ -79,12 +96,24 @@ function addEmployee () {
     
 }
 
-function createDepartment () {
-    
+function addDepartment () {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'department',
+            message: 'Enter a department:'
+        }
+    ]).then(data => {
+        db.query('INSERT INTO department SET?', {name: data.department}, (err, res) => {
+            if (err) throw err;
+            console.log('success')
+            promptUser()
+        })
+    })
 }
 
 function done () {
-    
+db.close();
 }
 
 //INIT
